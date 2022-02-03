@@ -1,3 +1,8 @@
+import { NavigationContainer } from '@react-navigation/native';
+import {
+  createNativeStackNavigator,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
 import {
   FlatList,
   StyleSheet,
@@ -5,14 +10,10 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import {
-  createNativeStackNavigator,
-  NativeStackScreenProps,
-} from '@react-navigation/native-stack';
-import * as pages from './pages';
-import type { PageName } from './pages';
+import 'react-native-gesture-handler';
 import { Colors } from './constants';
+import type { PageName } from './pages';
+import * as pages from './pages';
 
 type RootStackParamList = Record<PageName | 'Home', undefined>;
 
