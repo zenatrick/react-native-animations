@@ -10,10 +10,10 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
-import 'react-native-gesture-handler';
-import { Colors } from './styles';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import type { PageName } from './pages';
 import * as pages from './pages';
+import { Colors } from './styles';
 
 type RootStackParamList = Record<PageName | 'Home', undefined>;
 
@@ -49,30 +49,32 @@ const HomeScreen = ({
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <Navigator initialRouteName="Home">
-        <Screen
-          name="Home"
-          component={HomeScreen}
-          options={{
-            headerStyle: styles.headerContainer,
-            headerTintColor: Colors.white,
-          }}
-        />
-        {pageList.map(({ pageName, title, PageComponent }) => (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer>
+        <Navigator initialRouteName="Home">
           <Screen
-            key={pageName}
-            name={pageName}
-            component={PageComponent}
+            name="Home"
+            component={HomeScreen}
             options={{
-              title,
               headerStyle: styles.headerContainer,
               headerTintColor: Colors.white,
             }}
           />
-        ))}
-      </Navigator>
-    </NavigationContainer>
+          {pageList.map(({ pageName, title, PageComponent }) => (
+            <Screen
+              key={pageName}
+              name={pageName}
+              component={PageComponent}
+              options={{
+                title,
+                headerStyle: styles.headerContainer,
+                headerTintColor: Colors.white,
+              }}
+            />
+          ))}
+        </Navigator>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 };
 export default App;
