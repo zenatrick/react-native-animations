@@ -2,7 +2,7 @@ import {
   FlatList,
   StyleSheet,
   Text,
-  TouchableOpacity,
+  TouchableHighlight,
   View,
 } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -12,6 +12,7 @@ import {
 } from '@react-navigation/native-stack';
 import * as pages from './pages';
 import type { PageName } from './pages';
+import { Colors } from './constants';
 
 type RootStackParamList = Record<PageName | 'Home', undefined>;
 
@@ -29,13 +30,19 @@ const HomeScreen = ({
   navigation,
 }: NativeStackScreenProps<RootStackParamList, 'Home'>) => (
   <FlatList
+    style={styles.pageContainer}
     data={pageList}
     keyExtractor={(item) => item.pageName}
     renderItem={({ item: { pageName, title } }) => (
-      <TouchableOpacity onPress={() => navigation.navigate(pageName)}>
-        <Text>{title}</Text>
-      </TouchableOpacity>
+      <TouchableHighlight
+        underlayColor={Colors.kombuGreen}
+        style={styles.pageListItemContainer}
+        onPress={() => navigation.navigate(pageName)}
+      >
+        <Text style={styles.pageListItemText}>{title}</Text>
+      </TouchableHighlight>
     )}
+    ItemSeparatorComponent={() => <View style={styles.pageListItemSeparator} />}
   />
 );
 
@@ -43,13 +50,24 @@ const App = () => {
   return (
     <NavigationContainer>
       <Navigator initialRouteName="Home">
-        <Screen name="Home" component={HomeScreen} />
+        <Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            headerStyle: styles.headerContainer,
+            headerTitleStyle: styles.headerTitle,
+          }}
+        />
         {pageList.map(({ pageName, title, PageComponent }) => (
           <Screen
             key={pageName}
             name={pageName}
             component={PageComponent}
-            options={{ title }}
+            options={{
+              title,
+              headerStyle: styles.headerContainer,
+              headerTitleStyle: styles.headerTitle,
+            }}
           />
         ))}
       </Navigator>
@@ -59,10 +77,29 @@ const App = () => {
 export default App;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
+  pageContainer: {
+    backgroundColor: Colors.spanishBistre,
+    paddingVertical: 20,
+  },
+  pageListItemContainer: {
+    height: 40,
     justifyContent: 'center',
+    paddingHorizontal: 20,
+    backgroundColor: Colors.rifleGreen,
+    borderRadius: 20,
+    marginHorizontal: 20,
+  },
+  pageListItemText: {
+    fontSize: 15,
+    color: 'white',
+  },
+  pageListItemSeparator: {
+    height: 2,
+  },
+  headerContainer: {
+    backgroundColor: Colors.honeyYellow,
+  },
+  headerTitle: {
+    color: 'black',
   },
 });
