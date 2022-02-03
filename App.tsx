@@ -36,7 +36,7 @@ const HomeScreen = ({
     keyExtractor={(item) => item.pageName}
     renderItem={({ item: { pageName, title } }) => (
       <TouchableHighlight
-        underlayColor={Colors.kombuGreen}
+        underlayColor={Colors.darkLiver}
         style={styles.pageListItemContainer}
         onPress={() => navigation.navigate(pageName)}
       >
@@ -56,7 +56,7 @@ const App = () => {
           component={HomeScreen}
           options={{
             headerStyle: styles.headerContainer,
-            headerTitleStyle: styles.headerTitle,
+            headerTintColor: Colors.white,
           }}
         />
         {pageList.map(({ pageName, title, PageComponent }) => (
@@ -67,7 +67,7 @@ const App = () => {
             options={{
               title,
               headerStyle: styles.headerContainer,
-              headerTitleStyle: styles.headerTitle,
+              headerTintColor: Colors.white,
             }}
           />
         ))}
@@ -79,28 +79,25 @@ export default App;
 
 const styles = StyleSheet.create({
   pageContainer: {
-    backgroundColor: Colors.spanishBistre,
+    backgroundColor: Colors.charcoal,
     paddingVertical: 20,
   },
   pageListItemContainer: {
     height: 40,
     justifyContent: 'center',
     paddingHorizontal: 20,
-    backgroundColor: Colors.rifleGreen,
+    backgroundColor: Colors.dimGray,
     borderRadius: 20,
     marginHorizontal: 20,
   },
   pageListItemText: {
     fontSize: 15,
-    color: 'white',
+    color: Colors.lightGray,
   },
   pageListItemSeparator: {
     height: 2,
   },
   headerContainer: {
-    backgroundColor: Colors.honeyYellow,
-  },
-  headerTitle: {
-    color: 'black',
+    backgroundColor: Colors.darkLiver,
   },
 });
