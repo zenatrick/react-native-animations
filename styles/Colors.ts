@@ -1,5 +1,3 @@
-import { ColorValue } from 'react-native';
-
 const Colors = {
   white: 'rgb(255, 255, 255)',
   lightGray: 'rgb(235, 235, 235)',

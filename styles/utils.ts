@@ -1,6 +1,5 @@
 import { ColorValue, ViewStyle } from 'react-native';
-
-import { Colors } from '.';
+import Colors from './Colors';
 
 export const getCircleStyle = ({
   diameter,
