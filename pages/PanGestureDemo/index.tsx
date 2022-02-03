@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 const title = 'Pan Gesture Demo';
-const PanGestureDemo = () => {
+const PanGestureDemo: React.FC = () => {
   return (
     <View style={styles.pageContainer}>
       <Text>Pan Gesture Demo</Text>

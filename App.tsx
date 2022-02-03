@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import 'react-native-gesture-handler';
-import { Colors } from './constants';
+import { Colors } from './styles';
 import type { PageName } from './pages';
 import * as pages from './pages';
 
