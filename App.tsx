@@ -11,9 +11,10 @@ import {
   View,
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import type { PageName } from './pages';
 import * as pages from './pages';
 import { Colors } from './styles';
+
+import type { PageName } from './pages';
 
 type RootStackParamList = Record<PageName | 'Home', undefined>;
 

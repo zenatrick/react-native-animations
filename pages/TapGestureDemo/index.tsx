@@ -1,9 +1,11 @@
-import { ColorValue, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector, State } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
+
+import type { ColorValue } from 'react-native';
 
 const title = 'Tap Gesture Demo';
 const TapGestureDemo: React.FC = () => {
