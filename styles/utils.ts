@@ -1,4 +1,4 @@
-import Colors from './Colors';
+import { Colors } from './constant';
 
 import type { ColorValue, ViewStyle } from 'react-native';
 
