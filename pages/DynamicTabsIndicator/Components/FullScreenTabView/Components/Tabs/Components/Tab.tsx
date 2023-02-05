@@ -10,7 +10,6 @@ export type TabLayout = {
 };
 
 type TabProp = {
-  key: string;
   title: string;
   fontSize: number;
   onPress: () => void;
@@ -24,15 +23,8 @@ const tabHitSlop: Insets = {
   bottom: 15,
 };
 
-const Tab: React.FC<TabProp> = ({
-  key,
-  title,
-  fontSize,
-  onPress,
-  setLayout,
-}) => (
+const Tab: React.FC<TabProp> = ({ title, fontSize, onPress, setLayout }) => (
   <View
-    key={key}
     onLayout={({
       nativeEvent: {
         layout: { width, x },

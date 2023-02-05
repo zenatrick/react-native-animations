@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useAnimatedStyle } from 'react-native-reanimated';
+import { Colors } from '../../../../../../styles';
 import Indicator from './Components/Indicator';
 import Tab from './Components/Tab';
 
 import type { TabLayout } from './Components/Tab';
-import { Colors } from '../../../../../../styles';
 
 type TabProps = {
   data: Array<{ key: string; title: string }>;
