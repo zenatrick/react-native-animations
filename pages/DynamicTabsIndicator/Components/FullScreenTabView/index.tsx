@@ -32,6 +32,7 @@ const FullScreenTabView: React.FC<FullScreenTabViewProps> = ({ data }) => {
         showsHorizontalScrollIndicator={false}
         pagingEnabled
         bounces={false}
+        scrollEventThrottle={1}
         renderItem={({ item }) => (
           <View>
             <Image
