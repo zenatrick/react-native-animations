@@ -14,16 +14,16 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as pages from './pages';
 import { Colors } from './styles';
 
-import type { PageName } from './pages';
-
 type RootStackParamList = Record<PageName | 'Home', undefined>;
 
 const { Navigator, Screen } = createNativeStackNavigator<RootStackParamList>();
 
+type PageName = keyof typeof pages;
+
 const pageList = Object.entries(pages).map(
-  ([key, { title, PageComponent }]) => ({
+  ([key, { pageOptions, PageComponent }]) => ({
     pageName: key as PageName,
-    title,
+    options: pageOptions,
     PageComponent,
   })
 );
@@ -35,7 +35,12 @@ const HomeScreen = ({
     style={styles.pageContainer}
     data={pageList}
     keyExtractor={(item) => item.pageName}
-    renderItem={({ item: { pageName, title } }) => (
+    renderItem={({
+      item: {
+        pageName,
+        options: { title },
+      },
+    }) => (
       <TouchableHighlight
         underlayColor={Colors.darkLiver}
         style={styles.pageListItemContainer}
@@ -52,25 +57,20 @@ const App = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
-        <Navigator initialRouteName="Home">
-          <Screen
-            name="Home"
-            component={HomeScreen}
-            options={{
-              headerStyle: styles.headerContainer,
-              headerTintColor: Colors.white,
-            }}
-          />
-          {pageList.map(({ pageName, title, PageComponent }) => (
+        <Navigator
+          initialRouteName="Home"
+          screenOptions={{
+            headerStyle: styles.headerContainer,
+            headerTintColor: Colors.white,
+          }}
+        >
+          <Screen name="Home" component={HomeScreen} />
+          {pageList.map(({ pageName, options, PageComponent }) => (
             <Screen
               key={pageName}
               name={pageName}
               component={PageComponent}
-              options={{
-                title,
-                headerStyle: styles.headerContainer,
-                headerTintColor: Colors.white,
-              }}
+              options={options}
             />
           ))}
         </Navigator>

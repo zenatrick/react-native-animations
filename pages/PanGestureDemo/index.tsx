@@ -6,7 +6,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Colors, getCircleStyle } from '../../styles';
 
-const title = 'Pan Gesture Demo';
+const pageOptions = {
+  title: 'Pan Gesture Demo',
+};
 const PanGestureDemo: React.FC = () => {
   const translation = useSharedValue({ x: 0, y: 0 });
   const offset = useSharedValue({ x: 0, y: 0 });
@@ -39,7 +41,7 @@ const PanGestureDemo: React.FC = () => {
   );
 };
 
-export { title, PanGestureDemo as PageComponent };
+export { pageOptions, PanGestureDemo as PageComponent };
 
 const styles = StyleSheet.create({
   pageContainer: {

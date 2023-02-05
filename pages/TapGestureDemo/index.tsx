@@ -7,7 +7,9 @@ import Animated, {
 
 import type { ColorValue } from 'react-native';
 
-const title = 'Tap Gesture Demo';
+const pageOptions = {
+  title: 'Tap Gesture Demo',
+};
 const TapGestureDemo: React.FC = () => {
   const backgroundColor = useSharedValue<ColorValue>('transparent');
   const containerStyle = useAnimatedStyle(() => ({
@@ -38,7 +40,7 @@ const TapGestureDemo: React.FC = () => {
   );
 };
 
-export { title, TapGestureDemo as PageComponent };
+export { pageOptions, TapGestureDemo as PageComponent };
 
 const styles = StyleSheet.create({
   pageContainer: {
