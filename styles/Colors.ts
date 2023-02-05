@@ -12,6 +12,7 @@ const Colors = {
   black60: 'rgba(0, 0, 0, 0.6)',
   black55: 'rgba(0, 0, 0, 0.55)',
   black50: 'rgba(0, 0, 0, 0.5)',
+  black30: 'rgba(0, 0, 0, 0.3)',
 
   charcoal: '#394053',
   darkLiver: '#4e4a59',
