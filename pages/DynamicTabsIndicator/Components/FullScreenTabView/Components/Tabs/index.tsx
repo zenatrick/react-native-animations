@@ -5,9 +5,14 @@ import { Colors } from '../../../../../../styles';
 import Indicator from './Components/Indicator';
 import Tab from './Components/Tab';
 
-import type { TabLayout } from './Components/Tab';
+import type { TabProps } from './Components/Tab';
 
-type TabProps = {
+type TabLayout = {
+  width: number;
+  x: number;
+};
+
+type TabsProps = {
   data: Array<{ key: string; title: string }>;
   selectedIndex: number;
   selectIndex: (index: number) => void;
@@ -15,7 +20,7 @@ type TabProps = {
 
 const emptyLayout = { width: 0, x: 0 };
 
-const Tabs: React.FC<TabProps> = ({ data, selectedIndex, selectIndex }) => {
+const Tabs: React.FC<TabsProps> = ({ data, selectedIndex, selectIndex }) => {
   const [tabLayouts, setTabLayouts] = useState<TabLayout[]>(
     data.map(() => ({ ...emptyLayout }))
   );
@@ -30,21 +35,28 @@ const Tabs: React.FC<TabProps> = ({ data, selectedIndex, selectIndex }) => {
 
   return (
     <View style={styles.container}>
-      {data.map(({ key, title }, index) => (
-        <Tab
-          key={key}
-          title={title}
-          fontSize={84 / data.length}
-          setLayout={({ width, x }) => {
-            setTabLayouts((currLayout) =>
-              [...currLayout].map((tabLayout, i) =>
-                index === i ? { width, x } : tabLayout
-              )
-            );
-          }}
-          onPress={() => selectIndex(index)}
-        />
-      ))}
+      {data.map(({ key, title }, index) => {
+        const handleSetLayout: TabProps['onLayout'] = ({
+          nativeEvent: {
+            layout: { width, x },
+          },
+        }) => {
+          setTabLayouts((currLayout) =>
+            [...currLayout].map((tabLayout, i) =>
+              index === i ? { width, x } : tabLayout
+            )
+          );
+        };
+        return (
+          <Tab
+            key={key}
+            title={title}
+            fontSize={84 / data.length}
+            onLayout={handleSetLayout}
+            onPress={() => selectIndex(index)}
+          />
+        );
+      })}
       <Indicator animatedStyle={indicatorAnimatedStyle} />
     </View>
   );
