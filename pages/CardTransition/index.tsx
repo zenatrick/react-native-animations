@@ -29,7 +29,6 @@ const useSpring = (state: boolean) => {
 
 const cards = allCards.slice(0, 5);
 
-console.log(cards.length, Math.ceil(cards.length / 2));
 const CardTransition: React.FC = () => {
   const [toggle, setToggle] = useState(false);
   const transition = useSpring(toggle);

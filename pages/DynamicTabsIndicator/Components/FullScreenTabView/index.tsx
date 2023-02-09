@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { Colors, SCREEN_HEIGHT, SCREEN_WIDTH } from '../../../../styles';
@@ -30,7 +30,7 @@ const renderListItem: ListRenderItem<DataPoint> = ({ item }) => (
 const keyExtractor = (item: DataPoint) => item.key;
 
 const FullScreenTabView: React.FC<FullScreenTabViewProps> = ({ data }) => {
-  const flatListRef = React.createRef<FlatList<DataPoint>>();
+  const flatListRef = useRef<FlatList<DataPoint>>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const selectIndex = useCallback(
