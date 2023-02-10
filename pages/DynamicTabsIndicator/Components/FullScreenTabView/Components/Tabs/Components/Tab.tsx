@@ -1,14 +1,16 @@
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Colors } from '../../../../../../../styles';
 
-import type { Insets, TextStyle, ViewProps } from 'react-native';
+import type { Insets, LayoutChangeEvent, TextStyle } from 'react-native';
 
 export type TabProps = {
   title: string;
+  index: number;
   fontSize: number;
-  onPress: () => void;
-  onLayout: ViewProps['onLayout'];
+  onPress: (index: number) => void;
+  onLayout: (e: LayoutChangeEvent, index: number) => void;
 };
 
 const tabHitSlop: Insets = {
@@ -18,9 +20,15 @@ const tabHitSlop: Insets = {
   bottom: 15,
 };
 
-const Tab: React.FC<TabProps> = ({ title, fontSize, onPress, onLayout }) => (
-  <View onLayout={onLayout}>
-    <TouchableOpacity onPress={onPress} hitSlop={tabHitSlop}>
+const Tab: React.FC<TabProps> = ({
+  title,
+  index,
+  fontSize,
+  onPress,
+  onLayout,
+}) => (
+  <View onLayout={(e) => onLayout(e, index)}>
+    <TouchableOpacity onPress={() => onPress(index)} hitSlop={tabHitSlop}>
       <Text
         style={StyleSheet.compose<TextStyle>(styles.titleText, { fontSize })}
       >
@@ -30,7 +38,7 @@ const Tab: React.FC<TabProps> = ({ title, fontSize, onPress, onLayout }) => (
   </View>
 );
 
-export default Tab;
+export default React.memo(Tab);
 
 const styles = StyleSheet.create({
   titleText: {

@@ -44,9 +44,12 @@ const FullScreenTabView: React.FC<FullScreenTabViewProps> = ({ data }) => {
     ({
       nativeEvent: { contentOffset, layoutMeasurement },
     }: NativeSyntheticEvent<NativeScrollEvent>) => {
-      setSelectedIndex(Math.floor(contentOffset.x / layoutMeasurement.width));
+      const newIndex = Math.round(contentOffset.x / layoutMeasurement.width);
+      if (newIndex !== selectedIndex) {
+        setSelectedIndex(newIndex);
+      }
     },
-    [setSelectedIndex]
+    [selectedIndex, setSelectedIndex]
   );
 
   return (

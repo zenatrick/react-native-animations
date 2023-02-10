@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useAnimatedStyle } from 'react-native-reanimated';
 import { Colors } from '../../../../../../styles';
@@ -18,7 +18,7 @@ type TabsProps = {
   selectIndex: (index: number) => void;
 };
 
-const emptyLayout = { width: 0, x: 0 };
+const emptyLayout: TabLayout = { width: 0, x: 0 };
 
 const Tabs: React.FC<TabsProps> = ({ data, selectedIndex, selectIndex }) => {
   const [tabLayouts, setTabLayouts] = useState<TabLayout[]>(
@@ -33,27 +33,35 @@ const Tabs: React.FC<TabsProps> = ({ data, selectedIndex, selectIndex }) => {
     [tabLayouts, selectedIndex]
   );
 
+  const handleSetLayout: TabProps['onLayout'] = useCallback(
+    (
+      {
+        nativeEvent: {
+          layout: { width, x },
+        },
+      },
+      index: number
+    ) => {
+      setTabLayouts((currLayout) =>
+        [...currLayout].map((tabLayout, i) =>
+          index === i ? { width, x } : tabLayout
+        )
+      );
+    },
+    [setTabLayouts]
+  );
+
   return (
     <View style={styles.container}>
       {data.map(({ key, title }, index) => {
-        const handleSetLayout: TabProps['onLayout'] = ({
-          nativeEvent: {
-            layout: { width, x },
-          },
-        }) => {
-          setTabLayouts((currLayout) =>
-            [...currLayout].map((tabLayout, i) =>
-              index === i ? { width, x } : tabLayout
-            )
-          );
-        };
         return (
           <Tab
             key={key}
             title={title}
+            index={index}
             fontSize={84 / data.length}
             onLayout={handleSetLayout}
-            onPress={() => selectIndex(index)}
+            onPress={selectIndex}
           />
         );
       })}
