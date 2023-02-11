@@ -5,9 +5,9 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import { Card, Cards } from '../../components';
+import { SCREEN_WIDTH } from '../../styles';
 
-const MAX_SCALE = 2;
+const MAX_SCALE = 10;
 
 const pageOptions = {
   title: 'Pinch Gesture Demo',
@@ -21,9 +21,19 @@ const PinchGestureDemo: React.FC = () => {
   const pinchGesture = Gesture.Pinch()
     .onStart(({ focalX, focalY }) => {
       scaleOffset.value = pinchScale.value;
+
+      // get previous focal values from previous origin
+      const oldFocalX = origin.value.x + cardSize.value.width / 2;
+      const oldFocalY = origin.value.y + cardSize.value.height / 2;
+
+      // get current point which we want to focus on
+      const mappedFocalX = oldFocalX + (focalX - oldFocalX) / pinchScale.value;
+      const mappedFocalY = oldFocalY + (focalY - oldFocalY) / pinchScale.value;
+
+      // TODO: currently pinch will focus on the correct point but it will zoom into it based on the original scale.
       origin.value = {
-        x: focalX - cardSize.value.width / 2,
-        y: focalY - cardSize.value.height / 2,
+        x: mappedFocalX - cardSize.value.width / 2,
+        y: mappedFocalY - cardSize.value.height / 2,
       };
     })
     .onChange(({ scale }) => {
@@ -58,9 +68,13 @@ const PinchGestureDemo: React.FC = () => {
           }) => {
             cardSize.value = { width, height };
           }}
-          style={scaleStyle}
         >
-          <Card card={Cards.Card1} />
+          <Animated.Image
+            source={{
+              uri: 'https://images.pexels.com/photos/3147528/pexels-photo-3147528.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500',
+            }}
+            style={[{ width: SCREEN_WIDTH, height: SCREEN_WIDTH }, scaleStyle]}
+          />
         </Animated.View>
       </GestureDetector>
     </View>
