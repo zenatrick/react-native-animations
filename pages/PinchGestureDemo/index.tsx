@@ -2,6 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
@@ -13,49 +14,92 @@ const pageOptions = {
   title: 'Pinch Gesture Demo',
 };
 const PinchGestureDemo: React.FC = () => {
-  const cardSize = useSharedValue({ width: 0, height: 0 });
-  const pinchScale = useSharedValue(1);
-  const scaleOffset = useSharedValue(1);
-  const origin = useSharedValue({ x: 0, y: 0 });
+  const imageSize = useSharedValue({ width: 0, height: 0 });
+
+  /**
+   * Used to keep track of how much to scale the image.
+   */
+  const scale = useSharedValue(1);
+
+  /**
+   * Used to keep track of the starting scale value to that the further scaling can be
+   * applied on top of the starting scale.
+   */
+  const startScale = useSharedValue(1);
+
+  /**
+   * Used to keep track of the previous focalX and focalX.
+   */
+  const prevFocal = useSharedValue({ x: 0, y: 0 });
+
+  /**
+   * Used to determine the focal point of the zoom in the original image grid.
+   */
+  const zoomFocal = useSharedValue({ x: 0, y: 0 });
+
+  /**
+   * Used to translate the image on subsequent zooms.
+   */
+  const originShift = useSharedValue({ x: 0, y: 0 });
+
+  /**
+   * zoomFocal's origin is at the top left corner of the image
+   * but zooming happens relative to the center of the image.
+   *
+   * Therefore, we need to transform the zoomFocal's origin the
+   * center of the image.
+   */
+  const translatedZoomFocal = useDerivedValue(() => ({
+    x: zoomFocal.value.x - imageSize.value.width / 2,
+    y: zoomFocal.value.y - imageSize.value.height / 2,
+  }));
+
+  const zoomStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: translatedZoomFocal.value.x + originShift.value.x },
+      { translateY: translatedZoomFocal.value.y + originShift.value.y },
+      { scale: scale.value },
+      { translateY: -translatedZoomFocal.value.y },
+      { translateX: -translatedZoomFocal.value.x },
+    ],
+  }));
 
   const pinchGesture = Gesture.Pinch()
     .onStart(({ focalX, focalY }) => {
-      scaleOffset.value = pinchScale.value;
+      startScale.value = scale.value;
 
-      // get previous focal values from previous origin
-      const oldFocalX = origin.value.x + cardSize.value.width / 2;
-      const oldFocalY = origin.value.y + cardSize.value.height / 2;
-
-      // get current point which we want to focus on
-      const mappedFocalX = oldFocalX + (focalX - oldFocalX) / pinchScale.value;
-      const mappedFocalY = oldFocalY + (focalY - oldFocalY) / pinchScale.value;
-
-      // TODO: currently pinch will focus on the correct point but it will zoom into it based on the original scale.
-      origin.value = {
-        x: mappedFocalX - cardSize.value.width / 2,
-        y: mappedFocalY - cardSize.value.height / 2,
+      const zoomFocalRelativeToLastZoom = {
+        x: prevFocal.value.x + (focalX - prevFocal.value.x) / scale.value,
+        y: prevFocal.value.y + (focalY - prevFocal.value.y) / scale.value,
       };
+
+      zoomFocal.value = {
+        x: zoomFocalRelativeToLastZoom.x - originShift.value.x,
+        y: zoomFocalRelativeToLastZoom.y - originShift.value.y,
+      };
+
+      originShift.value = {
+        x: focalX - zoomFocalRelativeToLastZoom.x + originShift.value.x,
+        y: focalY - zoomFocalRelativeToLastZoom.y + originShift.value.y,
+      };
+
+      prevFocal.value = { x: focalX, y: focalY };
     })
-    .onChange(({ scale }) => {
-      let result = scale * scaleOffset.value;
+    .onChange(({ scale: newScale }) => {
+      let result = newScale * startScale.value;
       if (result > MAX_SCALE) {
         result = MAX_SCALE;
       }
-      pinchScale.value = result;
+      scale.value = result;
     })
     .onEnd(() => {
-      pinchScale.value = withSpring(1, { damping: 100 });
+      // TODO: Move this into a reset button
+      scale.value = withSpring(1, { damping: 100 }, () => {
+        prevFocal.value = { x: 0, y: 0 };
+        zoomFocal.value = { x: 0, y: 0 };
+        originShift.value = { x: 0, y: 0 };
+      });
     });
-
-  const scaleStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: origin.value.x },
-      { translateY: origin.value.y },
-      { scale: pinchScale.value },
-      { translateY: -origin.value.y },
-      { translateX: -origin.value.x },
-    ],
-  }));
 
   return (
     <View style={styles.pageContainer}>
@@ -66,14 +110,14 @@ const PinchGestureDemo: React.FC = () => {
               layout: { width, height },
             },
           }) => {
-            cardSize.value = { width, height };
+            imageSize.value = { width, height };
           }}
         >
           <Animated.Image
             source={{
               uri: 'https://images.pexels.com/photos/3147528/pexels-photo-3147528.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500',
             }}
-            style={[{ width: SCREEN_WIDTH, height: SCREEN_WIDTH }, scaleStyle]}
+            style={[{ width: SCREEN_WIDTH, height: SCREEN_WIDTH }, zoomStyle]}
           />
         </Animated.View>
       </GestureDetector>
