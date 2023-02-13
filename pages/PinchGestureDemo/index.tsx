@@ -30,17 +30,20 @@ const PinchGestureDemo: React.FC = () => {
   /**
    * Used to keep track of the previous focalX and focalX.
    */
-  const prevFocal = useSharedValue({ x: 0, y: 0 });
+  const prevFocalX = useSharedValue(0);
+  const prevFocalY = useSharedValue(0);
 
   /**
    * Used to determine the focal point of the zoom in the original image grid.
    */
-  const zoomFocal = useSharedValue({ x: 0, y: 0 });
+  const zoomFocalX = useSharedValue(0);
+  const zoomFocalY = useSharedValue(0);
 
   /**
    * Used to translate the image on subsequent zooms.
    */
-  const originShift = useSharedValue({ x: 0, y: 0 });
+  const originShiftX = useSharedValue(0);
+  const originShiftY = useSharedValue(0);
 
   /**
    * zoomFocal's origin is at the top left corner of the image
@@ -50,40 +53,52 @@ const PinchGestureDemo: React.FC = () => {
    * center of the image.
    */
   const translatedZoomFocal = useDerivedValue(() => ({
-    x: zoomFocal.value.x - imageSize.value.width / 2,
-    y: zoomFocal.value.y - imageSize.value.height / 2,
+    x: zoomFocalX.value - imageSize.value.width / 2,
+    y: zoomFocalY.value - imageSize.value.height / 2,
   }));
 
   const zoomStyle = useAnimatedStyle(() => ({
     transform: [
-      { translateX: translatedZoomFocal.value.x + originShift.value.x },
-      { translateY: translatedZoomFocal.value.y + originShift.value.y },
+      { translateX: translatedZoomFocal.value.x + originShiftX.value },
+      { translateY: translatedZoomFocal.value.y + originShiftY.value },
       { scale: scale.value },
       { translateY: -translatedZoomFocal.value.y },
       { translateX: -translatedZoomFocal.value.x },
     ],
   }));
 
+  // TODO: improve the reset zoom animation. Currently it doesnt not zoom back smoothly.
+  const resetZoomTransformation = () => {
+    'worklet';
+
+    const zero = withSpring(0, { damping: 100 });
+    prevFocalX.value = 0;
+    prevFocalY.value = 0;
+    zoomFocalX.value = zero;
+    zoomFocalY.value = zero;
+    originShiftX.value = zero;
+    originShiftY.value = zero;
+  };
+
   const pinchGesture = Gesture.Pinch()
     .onStart(({ focalX, focalY }) => {
       startScale.value = scale.value;
 
       const zoomFocalRelativeToLastZoom = {
-        x: prevFocal.value.x + (focalX - prevFocal.value.x) / scale.value,
-        y: prevFocal.value.y + (focalY - prevFocal.value.y) / scale.value,
+        x: prevFocalX.value + (focalX - prevFocalX.value) / scale.value,
+        y: prevFocalY.value + (focalY - prevFocalY.value) / scale.value,
       };
 
-      zoomFocal.value = {
-        x: zoomFocalRelativeToLastZoom.x - originShift.value.x,
-        y: zoomFocalRelativeToLastZoom.y - originShift.value.y,
-      };
+      zoomFocalX.value = zoomFocalRelativeToLastZoom.x - originShiftX.value;
+      zoomFocalY.value = zoomFocalRelativeToLastZoom.y - originShiftY.value;
 
-      originShift.value = {
-        x: focalX - zoomFocalRelativeToLastZoom.x + originShift.value.x,
-        y: focalY - zoomFocalRelativeToLastZoom.y + originShift.value.y,
-      };
+      originShiftX.value =
+        focalX - zoomFocalRelativeToLastZoom.x + originShiftX.value;
+      originShiftY.value =
+        focalY - zoomFocalRelativeToLastZoom.y + originShiftY.value;
 
-      prevFocal.value = { x: focalX, y: focalY };
+      prevFocalX.value = focalX;
+      prevFocalY.value = focalY;
     })
     .onChange(({ scale: newScale }) => {
       let result = newScale * startScale.value;
@@ -93,17 +108,30 @@ const PinchGestureDemo: React.FC = () => {
       scale.value = result;
     })
     .onEnd(() => {
-      // TODO: Move this into a reset button
-      scale.value = withSpring(1, { damping: 100 }, () => {
-        prevFocal.value = { x: 0, y: 0 };
-        zoomFocal.value = { x: 0, y: 0 };
-        originShift.value = { x: 0, y: 0 };
-      });
+      if (scale.value < 1) {
+        scale.value = withSpring(1, { damping: 100 }, resetZoomTransformation);
+      }
     });
+
+  const doubleTapGesture = Gesture.Tap()
+    .numberOfTaps(2)
+    .onStart(({ x, y }) => {
+      if (scale.value === 1) {
+        zoomFocalX.value = x;
+        zoomFocalY.value = y;
+        prevFocalX.value = x;
+        prevFocalY.value = y;
+        scale.value = withSpring(2, { damping: 100 });
+      } else if (scale.value > 1) {
+        scale.value = withSpring(1, { damping: 100 }, resetZoomTransformation);
+      }
+    });
+
+  const composedGesture = Gesture.Exclusive(pinchGesture, doubleTapGesture);
 
   return (
     <View style={styles.pageContainer}>
-      <GestureDetector gesture={pinchGesture}>
+      <GestureDetector gesture={composedGesture}>
         <Animated.View
           onLayout={({
             nativeEvent: {
